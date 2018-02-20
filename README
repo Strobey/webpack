@@ -1,0 +1,198 @@
+WEBPACK 0.7beta
+===============
+
+What is it?
+
+ Webpack is an open-source command-line tool for automatically packing websites
+by shrinking them down without affecting the way they look or behave.
+ Webpack is also useful for losslessly shrinking image collections and locating
+corrupted files.
+ Webpack works by stripping unnecesary information from images, optimising the
+compression of images & other compressed files, and removing comments/whitespace
+from html.
+ This makes for a faster website for your visitors, and lower bandwidth
+usage/costs for you! (oh, and it's free - both as in speech and as in beer).
+
+Features
+    * Losslessly packs GIF, JPG & PNG images (images are pixel-for-pixel identical, no quality loss)
+    * Strips HTML of unneeded comments/whitespace (with HTML::Clean)
+    * Optimises compression of ZIP, GZ, & BZ2 files
+    * Always copies the original file if it can't be improved (files never get bigger)
+    * Prints lots of useful statistics, including size breakdown by image type
+    * Maintains original time/date stamps of copied files
+    * quiet mode -q (show only errors)
+    * brute mode -b (try really hard - makes some files even smaller)
+    * update mode -u (update existing destination files if the source file is newer)
+    * force overwrite mode -f (replace any existing files)
+
+ Webpack is "safe" in that it is designed to create a compressed replica of a
+directory tree, so your original files are not touched.
+ Any files it doesn't know what to do with are copied verbatim.
+ Essentially you run webpack on your websites original files and upload the
+"webpacked" version to your webserver - easy!
+
+
+How Do I Use It?
+1. First, install prerequisites
+
+On your typical Ubuntu based distro you only need this:
+sudo apt install libjpeg-progs gifsicle optipng advancecomp
+
+Cygwin - see homepage for a separate package for Cygwin with precompiled binaries
+
+(Read further if that doesn't work for you, otherwise skip to step 2.)
+ Webpack relies on several readily available command line tools to process
+various types of files.
+ You will need to install some (preferably all) of these for it to be useful.
+ Most of them either come with your linux distribution or are easy to compile
+(usually ./configure; make; make install or less).
+ At an absolute minimum, install jpegtran (usually already installed) and gifsicle.
+ If you don't have some of these tools installed webpack will just copy the
+particular type of file that tool would have processed uncompressed.
+
+Preferred Tools:
+    * jpegtran - supplied with most linux distributions as part of the jpeg, libjpeg, libjpeg-progs or jpegtools package
+        o Homepage: http://http://jpegclub.org/jpegtran/
+    * gifsicle - excellent GIF optimizer
+        o Homepage: http://www.lcdf.org/gifsicle/
+    * OptiPNG - advanced PNG optimizer
+        o Homepage: http://optipng.sourceforge.net/
+    * advancecomp - used to optimise compression of gz/zip/png files
+        o Homepage: http://www.advancemame.it/comp-readme
+    * HTML::Clean - Perl module to compress HTML
+        o Homepage: http://search.cpan.org/~lindner/HTML-Clean-0.8/    
+
+Backup Tools (only use these if you can't use or get the above for some reason):
+    * pngcrush - this may be supplied with some linux distributions as package pngcrush
+        o Homepage: http://pmt.sourceforge.net/pngcrush/
+    * giftrans - supplied with many linux distributions as package giftrans
+        o Download source: http://ftp.debian.org/debian/pool/main/g/giftrans/giftrans_1.12.2.orig.tar.gz
+    
+    
+2. Install the webpack script
+
+Simply copy "webpack" into ~/bin or /usr/local/bin (whichever is
+your preference). You may need to set it executable ("chmod +x webpack")
+
+
+3. Run It!
+
+a) change into the directory you want to 'webpack' eg "cd ~/mysite"
+b) do a "webpack <output directory>" eg "webpack ~/mysitepacked"
+.. and that's it - webpack will create a packed replica of the current
+directory (and subdirectories) in <output directory>.
+
+Use the -b (brute) option if you want more file reduction at the expense of
+speed.
+
+Use the -q (quiet) option if you want to see only warnings/errors.
+
+ Webpack will remind you what to do with no arguments, and there is some error
+checking to stop accidents.
+NOTE you can't use webpack in-place. It is only intended to create a compressed
+copy of a directory tree, because it is DESTRUCTIVE to the files, and because
+stuff happens, you could lose your original website files.
+Think of it as a compiler - the output is the compressed version of your website.
+You wouldn't ask a compiler to destroy your source code!
+
+
+
+FeedBack
+
+ Feedback/suggestions/bugreports are encouraged!
+ Webpack is in development and works for us, but we need testers and feedback
+from you, so please contact us if you use it!
+ 
+Homepage - http://www.kludgesoft.com/nix/webpack.html
+Email feedback, suggestions, money etc. to: ezza (at) kludgesoft [dot] com
+
+
+LICENSE
+
+Webpack is released under the terms of the GNU General Public License (GPL).
+
+
+
+History:
+
+WebPack 0.1 alpha 18/04/2004
+- first release
+- processes gif, jpg & png files only
+- limited sanity checking, but won't overwrite anything
+
+0.2 alpha 8/05/2004
+- track input & output filesizes
+  - print #files, inbytes, outbytes & % reduction
+  - separate stats for images/remainder/total
+  - break down to individual image/file type
+  - print % and byte reduction for each file
+- check if file got bigger (or was same size) and copy original if it did
+  (prints "!")
+  - for jpg, also try non-progressive to see if it's smaller before copying
+  original (prints "*")
+- try to maintain flags, modified time etc if original was copied
+- update/make clear licensing (GPL)
+
+0.3 beta 5/07/2004
+- it's now beta because it works for me :)
+- implemented options/flags logic
+- use HTMLCrunch for compressing html (results not that good unfortunately)
+- implement brute mode (-b)
+  - always try both interlaced & non-interlaced for jpgs
+  - supply -brute flag to pngcrush
+- recompress bzip2 files if -9 wasn't used (-9 is default)
+  - checks file for what method was used (not sure if this is 100% reliable?)
+
+0.4 beta 19/07/2004
+- now also work with gifsicle for GIFs (WAY better than giftrans)
+- quiet mode (-q) - show only errors/warnings
+- show time taken in m:s
+- simplify output a little
+
+0.5 beta 13/09/2004
+- catch (more) pngcrush failures
+- minor cleanups
+- more sanity checking
+- implement process-existing-files-only-if-source-newer-than-target (-u)
+  - now can use in an automated way to keep a website updated
+- implement force overwrite (-f) (hidden for the moment)
+
+0.6 beta 4/10/2004
+- WAY more sanity checking
+  - check if source or destination is the root directory
+  - check if output is same as, subdirectory of or parent of current directory
+  - now checks all stupid combinations of source/destination directories I could imagine
+- enable force overwrite (-f) option
+- works with (more) paths with spaces in them
+- add support for HTML::Clean for html compression
+- add support for advancecomp (compression optimizer):
+  - use advdef to recompress *.gz (and *.png if pngcrush not installed)
+  - use advzip to recompress *.zip
+  - brute mode (-b) enables -4 (compress extreme) option on advdef/advzip
+
+0.7 beta 20/02/2018
+- Drag webpack kicking and screaming into the current decade and put up on github for others to play with
+- Add support for OptiPNG which seems to work better than pngcrush, so OptiPNG is the default if both are installed
+- Remove support for htmlcrunch as it's no longer maintained (website doesn't exist)
+- Don't strip JPG files of additional metadata to preserve EXIF tags etc.
+- Remove pngcrush from cygwin distribution as it's available natively from the cygwin setup
+
+  
+
+To-Do
+
+This is a rough list of things to implement or suggestions from users:
+
+    * Investigate other modern tools, e.g. jpegoptim, libhtml-packer-perl
+    * Debug/verbose mode (print input & output files, directory creation etc)
+    * Find/create a better html compressor (better than htmlcrunch)
+    * Perform duplicate checking of output dir & inform user of duplicates
+
+   
+ Let us know if you find this useful and if you have suggestions/patches/
+praise/bugreports for it as they are most welcome.
+
+ Regards, the KludgeSoft development team.
+
+www.kludgesoft.com
+
